@@ -39,6 +39,8 @@ make install
 5. Do the database migration.
 ```bash
 make migrate
+
+make superuser
 ```
 
 6. Run the local server.
@@ -72,6 +74,8 @@ python pip install -r dev.requirements.txt
 3. Database migrate
 ```bash
 python manage.py migrate
+
+python manage.py createsuperuser
 ```
 
 4. Run server

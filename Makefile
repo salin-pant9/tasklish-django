@@ -34,7 +34,7 @@ django:
 # Install dependencies
 install:
 	@$(PYTHON) -m pip install --upgrade pip
-	@$(PYTHON) -m pip install -r requirements.txt
+	@$(PYTHON) -m pip install -r dev.requirements.txt
 
 # Run the Django development server
 run:
@@ -51,5 +51,8 @@ migrations:
 # Migrate
 migrate:
 	@$(PYTHON) manage.py migrate $(APP)
+
+superuser:
+	@$(PYTHON) manage.py createsuperuser
 
 .PHONY: venv django install run app makemigrations migrate
