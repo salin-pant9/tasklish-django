@@ -57,6 +57,11 @@ def login_view(request):
     return Response(response)
 
 
+@swagger_auto_schema(
+    method="post",
+    responses={200: RegisterSerializer()},
+    request_body=RegisterSerializer,
+)
 @api_view(["POST"])
 def signup_view(request):
     """
@@ -82,6 +87,13 @@ def signup_view(request):
     return Response(response, status=201)
 
 
+@swagger_auto_schema(
+    method="get",
+    responses={
+        200: "Please check your email for the next step",
+        400: "Please check your email for the next step",
+    },
+)
 @api_view(["GET"])
 def password_reset_request(_, email):
     """
@@ -92,10 +104,17 @@ def password_reset_request(_, email):
         user = get_user_model().objects.get(email=email)
         _ = OTP.objects.create(user=user, otp_for=OTPAction.PASSWORD_RESET)
     except get_user_model().DoesNotExist:
-        return Response({"error": "Please check your email for the next step"})
+        return Response({"error": "Please check your email for the next step"}, status=400)
     return Response({"message": "Please check your email for the next step"})
 
 
+@swagger_auto_schema(
+    method="get",
+    responses={
+        200: "Thank you for confirming your account",
+        400: "Invalid OTP",
+    }
+)
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def confirm_otp(req, otp_code):
@@ -119,6 +138,14 @@ def confirm_otp(req, otp_code):
     return Response({"message": "Invalid OTP"})
 
 
+@swagger_auto_schema(
+    method="post",
+    responses={
+        200: "Your password has been updated",
+        400: "OTP is invalid",
+    },
+    request_body=PasswordResetSerializer,
+)
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def password_reset_confirm(req, otp_code):
