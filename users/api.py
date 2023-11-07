@@ -6,6 +6,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
+from drf_yasg.utils import swagger_auto_schema
+
 
 from .serializers import (
     LoginSerializer,
@@ -17,6 +19,11 @@ from .models import OTP
 from .utils import OTPAction
 
 
+@swagger_auto_schema(
+    method="post",
+    responses={200: UserSerializer()},
+    request_body=LoginSerializer,
+)
 @api_view(["POST"])
 def login_view(request):
     """
