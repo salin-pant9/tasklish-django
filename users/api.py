@@ -14,6 +14,7 @@ from .serializers import (
     UserSerializer,
     RegisterSerializer,
     PasswordResetSerializer,
+    LoginResponseSerializer
 )
 from .models import OTP
 from .utils import OTPAction
@@ -21,7 +22,7 @@ from .utils import OTPAction
 
 @swagger_auto_schema(
     method="post",
-    responses={200: UserSerializer()},
+    responses={200: LoginResponseSerializer()},
     request_body=LoginSerializer,
 )
 @api_view(["POST"])
@@ -51,15 +52,17 @@ def login_view(request):
         "user": UserSerializer(user).data,
         "token": token.key,
         "login_message": ""
-        if user.is_verified
+        if user.is_verified # type: ignore
         else "Please check your email and confirm your account",
     }
-    return Response(response)
+    serializer = LoginResponseSerializer(data=response) # type: ignore
+    serializer.is_valid(raise_exception=True)
+    return Response(serializer.data)
 
 
 @swagger_auto_schema(
     method="post",
-    responses={200: RegisterSerializer()},
+    responses={200: LoginResponseSerializer()},
     request_body=RegisterSerializer,
 )
 @api_view(["POST"])
@@ -84,7 +87,9 @@ def signup_view(request):
     # Return Token and user info
     token = Token.objects.create(user=user)
     response = {"user": UserSerializer(user).data, "token": token.key}
-    return Response(response, status=201)
+    response_serializer = LoginResponseSerializer(data=response) # type: ignore
+    response_serializer.is_valid(raise_exception=True)
+    return Response(response_serializer.data, status=201)
 
 
 @swagger_auto_schema(

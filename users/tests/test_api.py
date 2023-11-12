@@ -17,9 +17,15 @@ def test_login_success(client):
     should return a JSON object with "user", "token", and
     "login_message"
     """
-    test_user_info = {"username": "safal", "password": "safal1234"}
-    user = get_user_model().objects.create_user(**test_user_info)
+    test_user_info = {
+        "first_name": "safal",
+        "last_name": "safal",
+        "username": "safal",
+        "password": "safal1234"
+    }
+    user = get_user_model().objects.create_user(**test_user_info) # type: ignore
     resp = client.post(reverse("login"), test_user_info)
+
     assert resp.status_code == 200, "Should return 200"
     assert "user" in resp.data, "Should return user details"
     assert resp.data["user"]["username"] == user.username, "Should match user"

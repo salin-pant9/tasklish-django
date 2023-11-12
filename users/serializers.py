@@ -25,6 +25,13 @@ class UserSerializer(serializers.Serializer):
     last_name = serializers.CharField()
 
 
+class LoginResponseSerializer(serializers.Serializer):
+    """ User details after login. """
+    user = UserSerializer()
+    token = serializers.CharField()
+    login_message = serializers.CharField(required=False)
+
+
 class RegisterSerializer(serializers.Serializer):
     """ Basic user details on registration """
     username = serializers.CharField()
