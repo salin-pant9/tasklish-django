@@ -17,12 +17,12 @@ def test_otp_str_returns_username():
     """ str(otp) should return username """
     user = mixer.blend(get_user_model(), username="safal")
     otp = mixer.blend("users.OTP", user=user)
-    assert str(otp) == user.username, "Should return username"
+    assert str(otp) == user.username, "Should return username" # type: ignore
 
 
 def test_otp_generate_code():
     """ otp.generate_code produce 6-character token """
     user = mixer.blend(get_user_model(), username="safal")
     otp = mixer.blend("users.OTP", user=user)
-    otp.generate_code()
-    assert len(otp.code) == 6, "Code should be 6-character token"
+    otp.generate_code() # type: ignore
+    assert len(otp.code) == 6, "Code should be 6-character token" # type: ignore

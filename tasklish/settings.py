@@ -15,6 +15,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     # Local
     'users',
+    'board',
     # Third-party
     'rest_framework',
     'rest_framework.authtoken',
