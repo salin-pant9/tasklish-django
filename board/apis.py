@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
 from .serializers import BoardSerializer, BoardHoursSerializer
-from .models import Board, BoardHour
+from .models import Board
 
 
 @swagger_auto_schema(
@@ -43,7 +43,7 @@ def get_shared_board(request):
 @permission_classes([IsAuthenticated])
 def create_board(request):
     """Create a new board."""
-    serializer = BoardSerializer(data=request.data, context={"request": request})
+    serializer = BoardSerializer(data=request.data, context={"user": request.user})
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data)
@@ -72,3 +72,16 @@ def add_hours(request, board_id):
     board.save()
 
     return Response(BoardSerializer(board).data)
+
+
+@swagger_auto_schema(method="get", responses={200: BoardHoursSerializer()})
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_hours(request, board_id):
+    """Get hours for a board."""
+    try:
+        board = request.user.boards.get(id=board_id)
+    except Board.DoesNotExist:
+        return Response({"error": "Board not found."}, status=404)
+    serializer = BoardHoursSerializer(board.hours)
+    return Response(serializer.data)

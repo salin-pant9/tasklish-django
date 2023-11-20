@@ -5,6 +5,7 @@ from .apis import (
     get_shared_board,
     create_board,
     add_hours,
+    get_hours,
 )
 
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path("shared", get_shared_board, name="get_shared_board"),
     path("create", create_board, name="create_board"),
     path("add-hours/<int:board_id>", add_hours, name="board_add_hours"),
+    path("get-hours/<int:board_id>", get_hours, name="board_get_hours"),
 ]
