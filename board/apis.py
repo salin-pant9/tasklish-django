@@ -4,8 +4,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
-from .serializers import BoardSerializer, BoardHoursSerializer
+from .serializers import BoardSerializer, BoardHoursSerializer, CardSerializer
 from .models import Board
+
+
+################### Board ###################
 
 
 @swagger_auto_schema(
@@ -84,4 +87,47 @@ def get_hours(request, board_id):
     except Board.DoesNotExist:
         return Response({"error": "Board not found."}, status=404)
     serializer = BoardHoursSerializer(board.hours)
+    return Response(serializer.data)
+
+
+################### Card ###################
+
+
+@swagger_auto_schema(
+    method="get",
+    responses={200: CardSerializer(many=True)},
+)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_cards(request, board_id):
+    """Get all cards for a board."""
+    try:
+        board = request.user.boards.get(id=board_id)
+    except Board.DoesNotExist:
+        return Response({"error": "Board not found."}, status=404)
+    cards = board.cards.all()
+    serializer = CardSerializer(cards, many=True)
+    return Response(serializer.data)
+
+
+@swagger_auto_schema(
+    method="post",
+    request_body=CardSerializer,
+    responses={200: CardSerializer()},
+)
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_card(request, board_id):
+    """Create a new card."""
+
+    try:
+        board = request.user.boards.get(id=board_id)
+    except Board.DoesNotExist:
+        return Response({"error": "Board not found."}, status=404)
+
+    serializer = CardSerializer(
+        data=request.data, context={"user": request.user, "board": board}
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
     return Response(serializer.data)

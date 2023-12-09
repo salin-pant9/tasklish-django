@@ -6,6 +6,8 @@ from .apis import (
     create_board,
     add_hours,
     get_hours,
+    get_cards,
+    create_card,
 )
 
 
@@ -15,4 +17,6 @@ urlpatterns = [
     path("create", create_board, name="create_board"),
     path("add-hours/<int:board_id>", add_hours, name="board_add_hours"),
     path("get-hours/<int:board_id>", get_hours, name="board_get_hours"),
+    path("cards/<int:board_id>", get_cards, name="get_cards"),
+    path("card/create/<int:board_id>", create_card, name="create_card"),
 ]

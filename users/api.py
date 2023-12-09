@@ -14,7 +14,7 @@ from .serializers import (
     UserSerializer,
     RegisterSerializer,
     PasswordResetSerializer,
-    LoginResponseSerializer
+    LoginResponseSerializer,
 )
 from .models import OTP
 from .utils import OTPAction
@@ -44,18 +44,18 @@ def login_view(request):
         "login_message" : ""
     }
     """
+
     serializer = LoginSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = serializer.validated_data
     token, _ = Token.objects.get_or_create(user=user)
+
     response = {
         "user": UserSerializer(user).data,
         "token": token.key,
-        "login_message": ""
-        if user.is_verified # type: ignore
-        else "Please check your email and confirm your account",
     }
-    serializer = LoginResponseSerializer(data=response) # type: ignore
+
+    serializer = LoginResponseSerializer(data=response)  # type: ignore
     serializer.is_valid(raise_exception=True)
     return Response(serializer.data)
 
@@ -87,7 +87,7 @@ def signup_view(request):
     # Return Token and user info
     token = Token.objects.create(user=user)
     response = {"user": UserSerializer(user).data, "token": token.key}
-    response_serializer = LoginResponseSerializer(data=response) # type: ignore
+    response_serializer = LoginResponseSerializer(data=response)  # type: ignore
     response_serializer.is_valid(raise_exception=True)
     return Response(response_serializer.data, status=201)
 
@@ -109,7 +109,9 @@ def password_reset_request(_, email):
         user = get_user_model().objects.get(email=email)
         _ = OTP.objects.create(user=user, otp_for=OTPAction.PASSWORD_RESET)
     except get_user_model().DoesNotExist:
-        return Response({"error": "Please check your email for the next step"}, status=400)
+        return Response(
+            {"error": "Please check your email for the next step"}, status=400
+        )
     return Response({"message": "Please check your email for the next step"})
 
 
@@ -118,7 +120,7 @@ def password_reset_request(_, email):
     responses={
         200: "Thank you for confirming your account",
         400: "Invalid OTP",
-    }
+    },
 )
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -139,7 +141,9 @@ def confirm_otp(req, otp_code):
                 return Response({"message": "Thank you for confirming your account"})
             if otp.otp_for == OTPAction.PASSWORD_RESET:
                 # Confirm password reset
-                return redirect(reverse("password_reset_confirm", kwargs={"otp_code": otp.code}))
+                return redirect(
+                    reverse("password_reset_confirm", kwargs={"otp_code": otp.code})
+                )
     return Response({"message": "Invalid OTP"})
 
 

@@ -20,7 +20,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
     def save(self, **kwargs):
         """Save board and add the current user as the board owner"""
-        self.validated_data["created_by"] = self.context["user"].id  # type: ignore
+        self.validated_data["created_by"] = self.context["user"]  # type: ignore
         return super().save(**kwargs)
 
 
@@ -30,6 +30,13 @@ class CardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Card
         fields = "__all__"
+        read_only_fields = ["created_by", "board"]
+
+    def save(self, **kwargs):
+        """Save card and add the current user as the card owner"""
+        self.validated_data["created_by"] = self.context["user"]  # type: ignore
+        self.validated_data["board"] = self.context["board"]  # type: ignore
+        return super().save(**kwargs)
 
 
 class BoardHoursSerializer(serializers.ModelSerializer):

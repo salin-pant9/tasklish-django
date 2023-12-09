@@ -43,6 +43,10 @@ class Board(models.Model):
 
 
 class Card(models.Model):
+    """
+    Represents a card that is contained within a board.
+    """
+
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)

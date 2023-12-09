@@ -1,16 +1,17 @@
 """ Serializers for users """
-#pylint: disable=W0223
+# pylint: disable=W0223
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework import serializers
 
 
 class LoginSerializer(serializers.Serializer):
-    """ Username and Password for login """
+    """Username and Password for login"""
+
     username = serializers.CharField()
     password = serializers.CharField()
 
     def validate(self, attrs):
-        """ Authenticate user and return it only if user.is_active """
+        """Authenticate user and return it only if user.is_active"""
         user = authenticate(**attrs)
         if user and user.is_active:
             return user
@@ -18,7 +19,8 @@ class LoginSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.Serializer):
-    """ Few users details as a profile """
+    """Few users details as a profile"""
+
     id = serializers.CharField()
     username = serializers.CharField()
     first_name = serializers.CharField()
@@ -26,14 +28,16 @@ class UserSerializer(serializers.Serializer):
 
 
 class LoginResponseSerializer(serializers.Serializer):
-    """ User details after login. """
+    """User details after login."""
+
     user = UserSerializer()
     token = serializers.CharField()
     login_message = serializers.CharField(required=False)
 
 
 class RegisterSerializer(serializers.Serializer):
-    """ Basic user details on registration """
+    """Basic user details on registration"""
+
     username = serializers.CharField()
     email = serializers.CharField()
     first_name = serializers.CharField()
@@ -60,12 +64,13 @@ class RegisterSerializer(serializers.Serializer):
 
 
 class PasswordResetSerializer(serializers.Serializer):
-    """ Password confirmation for password reset """
+    """Password confirmation for password reset"""
+
     password1 = serializers.CharField()
     password2 = serializers.CharField()
 
     def validate(self, attrs):
-        """ Check if password1 and password2 matches """
+        """Check if password1 and password2 matches"""
         if attrs["password1"] == attrs["password2"]:
             return attrs["password1"]
         raise serializers.ValidationError("password did not matched. Try again.")
