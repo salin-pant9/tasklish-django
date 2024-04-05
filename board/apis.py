@@ -5,12 +5,10 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 
 from .serializers import BoardSerializer, BoardHoursSerializer, CardSerializer
-from .models import Board
+from .models import Board, Card
 
 
 ################### Board ###################
-
-
 @swagger_auto_schema(
     method="get",
     responses={200: BoardSerializer(many=True)},
@@ -91,8 +89,6 @@ def get_hours(request, board_id):
 
 
 ################### Card ###################
-
-
 @swagger_auto_schema(
     method="get",
     responses={200: CardSerializer(many=True)},
@@ -131,3 +127,42 @@ def create_card(request, board_id):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data)
+
+
+@swagger_auto_schema(
+    method="put",
+    request_body=CardSerializer,
+    responses={200: CardSerializer()},
+)
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def update_card(request, card_id):
+    """Update a Card."""
+
+    try:
+        card = Card.objects.get(id=card_id)
+    except Card.DoesNotExist:
+        return Response({"error": "Card not found."}, status=404)
+
+    serializer = CardSerializer(card, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
+
+
+@swagger_auto_schema(
+    method="delete",
+    responses={200: CardSerializer()},
+)
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_card(request, card_id):
+    """Delete a Card."""
+
+    try:
+        card = Card.objects.get(id=card_id)
+    except Card.DoesNotExist:
+        return Response({"error": "Card not found."}, status=404)
+
+    card.delete()
+    return Response({"message": "Card deleted."})
