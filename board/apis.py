@@ -136,15 +136,26 @@ def create_card(request, board_id):
 )
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
-def update_card(request, card_id):
+def update_card(request, card_id, board_id):
     """Update a Card."""
+    try:
+        board = Board.objects.get(id=board_id)
+    except Board.DoesNotExist:
+        return Response({"error": "Board not found"}, status=404)
 
     try:
         card = Card.objects.get(id=card_id)
+        if card.board != board:
+            return Response({"error": "Card not found in this board."}, status=404)
     except Card.DoesNotExist:
         return Response({"error": "Card not found."}, status=404)
 
-    serializer = CardSerializer(card, data=request.data, partial=True)
+    serializer = CardSerializer(
+        card,
+        data=request.data,
+        partial=True,
+        context={'user': request.user, 'board': board}
+    )
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(serializer.data)
